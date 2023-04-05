@@ -9,10 +9,6 @@ async function bootstrap() {
   app.setGlobalPrefix('/api'); // Setting base path
   app.useGlobalPipes(new ValidationPipe()); // Initialize global validation
 
-  const config = new ConfigService();
-  console.log(config);
-  console.log(config.get('PORT'));
-
-  await app.listen(config.get('PORT') || 8080);
+  await app.listen(process.env.PORT || 8080);
 }
 bootstrap();
