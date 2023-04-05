@@ -13,6 +13,6 @@ async function bootstrap() {
   console.log(config);
   console.log(config.get('PORT'));
 
-  await app.listen(config.get('PORT') || 3000);
+  await app.listen(config.get('PORT') || 8080);
 }
 bootstrap();
