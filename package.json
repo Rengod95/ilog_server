@@ -85,7 +85,7 @@
     "testEnvironment": "node"
   },
   "engines": {
-    "node": "18.12.0"
+    "node": ">=16.0.0 <17.0.0"
   },
   "main": "main.js"
 }
