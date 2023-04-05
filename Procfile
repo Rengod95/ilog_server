@@ -1,1 +1,1 @@
-web: npm deploy
+web: yarn deploy
