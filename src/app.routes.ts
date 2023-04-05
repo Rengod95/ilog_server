@@ -1,9 +1,9 @@
-import { PracticeModule } from './practice/practice.module';
 import { Routes } from '@nestjs/core';
+import { LogModule } from './log/log.module';
 
 export const RootRoutes: Routes = [
   {
-    path: '/practice',
-    module: PracticeModule,
+    path: 'log',
+    module: LogModule,
   },
 ];
