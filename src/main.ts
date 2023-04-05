@@ -9,6 +9,6 @@ async function bootstrap() {
   app.setGlobalPrefix('/api'); // Setting base path
   app.useGlobalPipes(new ValidationPipe()); // Initialize global validation
 
-  await app.listen(process.env.PORT || 8080);
+  await app.listen(process.env.PORT || 8081);
 }
 bootstrap();
