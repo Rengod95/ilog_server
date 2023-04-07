@@ -6,10 +6,10 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 export class LogController {
   constructor(private readonly logService: LogService) {}
 
-  @Get('/all')
-  getAllLogs() {
-    return this.logService.getAllLogs();
-  }
+  // @Get('/all')
+  // getAllLogs() {
+  //   return this.logService.getAllLogs();
+  // }
 
   @Post('/meta')
   createNewLogMeta(@Body() createLogMetaDto: CreateLogMetaDto) {

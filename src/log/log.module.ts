@@ -1,14 +1,15 @@
 import { LogRepository } from './log.repository';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AwsService } from './../commons/services/aws.service';
+
 import { Module } from '@nestjs/common';
 import { LogService } from './log.service';
 import { LogController } from './log.controller';
 import { Log, LogSchema } from './log.schema';
+import { AwsService } from 'src/aws/aws.service';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: Log.name, schema: LogSchema }])],
-  providers: [LogService, AwsService, LogRepository],
+  providers: [LogService, LogRepository],
   controllers: [LogController],
 })
 export class LogModule {}
