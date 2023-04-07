@@ -4,6 +4,7 @@ import { AWSError, S3 } from 'aws-sdk';
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { AwsRepository } from './aws.repository';
 import { BaseS3Object, IBaseS3Object } from './schema/s3-object.schema';
+import { UtilService } from 'src/shared/util.service';
 
 @Injectable()
 export class AwsService {
@@ -12,6 +13,7 @@ export class AwsService {
   constructor(
     @Inject(ConfigService) private readonly configService: ConfigService,
     @Inject(AwsRepository) private readonly awsRepository: AwsRepository,
+    @Inject(UtilService) private readonly utilService: UtilService,
   ) {
     this.s3 = new S3({
       credentials: {
@@ -43,14 +45,18 @@ export class AwsService {
     if (filteredETags.length === 0)
       return 'there was no new S3 Object to inject to mongo.';
 
-    const newObjects = contents.map((content) => {
-      for (const eTagInfo of filteredETags) {
-        if (content.ETag === eTagInfo.ETag) {
-          return content;
+    const newObjects = contents
+      .map((content) => {
+        for (const eTagInfo of filteredETags) {
+          if (content.ETag === eTagInfo.ETag) {
+            return content;
+          }
         }
-      }
-      return;
-    });
+        return;
+      })
+      .filter((obj) => !this.utilService.isEmpty(obj));
+
+    console.log(newObjects);
 
     await this.awsRepository.injectS3ObjectsToMongo(newObjects);
 

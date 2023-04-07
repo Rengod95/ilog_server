@@ -4,6 +4,7 @@ import { AwsService } from './aws.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BaseS3Object, BaseS3ObjectSchema } from './schema/s3-object.schema';
 import { AwsRepository } from './aws.repository';
+import { UtilService } from 'src/shared/util.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { AwsRepository } from './aws.repository';
     ]),
   ],
   controllers: [AwsController],
-  providers: [AwsService, AwsRepository],
+  providers: [AwsService, AwsRepository, UtilService],
 })
 export class AwsModule {}
