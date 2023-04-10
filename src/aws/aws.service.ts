@@ -170,22 +170,23 @@ export class AwsService {
 
   private async createBaseS3ObjectFromDto(dto: IBaseS3LambdaDto) {
     const eTag = this.extractETagFromObject(dto);
+    const key = this.extractObjectKeyFromS3Object(dto);
+    const url = this.createEncodedS3ObjectUrl(this.getBucketName(), key);
+
     const meta = await this.s3
       .headObject(
         {
           Bucket: this.getBucketName(),
-          Key: dto.Key,
+          Key: this.refineS3ObjectKey(key),
         },
         this.handleAwsBaseError,
       )
       .promise();
 
-    const url = this.createEncodedS3ObjectUrl(this.getBucketName(), dto.Key);
-
     const result: BaseS3Object = {
       ETag: eTag,
       LastModified: meta.LastModified,
-      Key: dto.Key,
+      Key: key,
       Url: url,
     };
 
@@ -224,6 +225,10 @@ export class AwsService {
 
   private extractObjectKeyFromS3Object(obj: S3.Object): S3.ObjectKey {
     return obj.Key;
+  }
+
+  private refineS3ObjectKey(key: S3.ObjectKey): S3.ObjectKey {
+    return key.replace(/\+/g, ' ');
   }
 
   private extractLastModifiedFromS3Object(obj: S3.Object): S3.LastModified {
