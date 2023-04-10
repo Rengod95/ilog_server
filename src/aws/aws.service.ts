@@ -42,10 +42,8 @@ export class AwsService {
 
   public async deleteExistS3Document(deleteS3LambdaDto: DeleteS3LambdaDto) {
     try {
-      const baseS3Object = await this.createBaseS3ObjectFromDto(
-        deleteS3LambdaDto,
-      );
-      const result = await this.awsRepository.deleteS3Document(baseS3Object);
+      const eTag = this.extractETagFromObject(deleteS3LambdaDto);
+      const result = await this.awsRepository.deleteS3Document(eTag);
       return result;
     } catch (error) {
       this.handleAwsBaseError(error);
