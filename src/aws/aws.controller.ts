@@ -1,31 +1,47 @@
 import { Body, Controller, Delete, Patch, Post } from '@nestjs/common';
 import { AwsService } from './aws.service';
-import { DeleteS3LambdaDto } from './dto/delete-object.dto';
-import { ModifyS3LambdaDto } from './dto/modify-object.dto';
+import { DeleteS3LambdaDto } from './dto/delete-s3-document.dto';
+import { UpdateS3LambdaDto } from './dto/update-s3-document.dto';
+import { CreateS3LambdaDto } from './dto/create-s3-document.dto';
 
 @Controller('/meta')
 export class AwsController {
   constructor(private readonly awsService: AwsService) {}
+
   /**
-   *
+   * @param createS3LambdaDto
    */
   @Post()
-  async syncLogMetaData() {
-    const res = await this.awsService.syncMetasToMongo();
-    return res;
+  async insertNewObject(@Body() createS3LambdaDto: CreateS3LambdaDto) {
+    const result = await this.awsService.insertNewS3Document(createS3LambdaDto);
+    return result;
   }
 
+  /**
+   *
+   * @param modifyS3LambdaDto
+   * @returns
+   */
   @Patch()
-  async modifyExistObject(@Body() modifyS3LambdaDto: ModifyS3LambdaDto) {
-    console.log(modifyS3LambdaDto);
-
-    return 'modified';
+  async updateExistObject(@Body() updateS3LambdaDto: UpdateS3LambdaDto) {
+    console.log(updateS3LambdaDto);
+    const result = await this.awsService.updateExistS3Document(
+      updateS3LambdaDto,
+    );
+    return result;
   }
 
+  /**
+   *
+   * @param deleteS3LambdaDto
+   * @returns
+   */
   @Delete()
   async deleteExistObject(@Body() deleteS3LambdaDto: DeleteS3LambdaDto) {
     console.log(deleteS3LambdaDto);
-
-    return 'deleted';
+    const result = await this.awsService.deleteExistS3Document(
+      deleteS3LambdaDto,
+    );
+    return;
   }
 }

@@ -17,13 +17,42 @@ export class AwsRepository implements MongoRepository {
    * @param eTag
    */
   public async findS3DocumentByETag(
-    eTag: string,
+    eTag: S3.ETag,
   ): Promise<BaseS3ObjectDocument> {
-    const document = await this.s3ObjectModel.findOne({ ETag: eTag }).exec();
-    return document;
+    const s3Document = await this.s3ObjectModel.findOne({ ETag: eTag }).exec();
+    return s3Document;
   }
 
-  public async injectS3ObjectsToMongo(S3ObjectArray: S3.Object[]) {
-    return await this.s3ObjectModel.insertMany(S3ObjectArray);
+  public async injectS3ObjectsToMongo(s3Objects: BaseS3Object[]) {
+    const s3Docs = s3Objects.map((s3Obj) => this.createS3Document(s3Obj));
+    const result = await this.s3ObjectModel.insertMany(s3Docs);
+    return result;
+  }
+
+  public async injectSingleS3Object(baseS3Object: BaseS3Object) {
+    const s3Doc = await this.createS3Document(baseS3Object);
+    const result = s3Doc.save();
+    return result;
+  }
+
+  public async deleteS3Document(baseS3Object: BaseS3Object) {
+    const result = await this.s3ObjectModel
+      .findOneAndDelete({ ETag: baseS3Object.ETag })
+      .exec();
+    return result;
+  }
+
+  public async replaceExistS3Document(replacement: BaseS3Object) {
+    const result = await this.s3ObjectModel
+      .findOneAndReplace({ ETag: replacement.ETag }, replacement)
+      .exec();
+    return result;
+  }
+
+  private async createS3Document(
+    baseS3Object: BaseS3Object,
+  ): Promise<BaseS3ObjectDocument> {
+    const result = await this.s3ObjectModel.create(baseS3Object);
+    return result;
   }
 }
