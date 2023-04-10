@@ -35,9 +35,9 @@ export class AwsRepository implements MongoRepository {
     return result;
   }
 
-  public async deleteS3Document(eTag: S3.ETag) {
+  public async deleteS3DocumentByKey(key: S3.ObjectKey) {
     const result = await this.s3ObjectModel
-      .findOneAndDelete({ ETag: eTag })
+      .findOneAndRemove({ Key: key })
       .exec();
     return result;
   }
