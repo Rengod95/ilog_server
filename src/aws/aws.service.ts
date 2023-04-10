@@ -45,7 +45,8 @@ export class AwsService {
       const baseS3Object = await this.createBaseS3ObjectFromDto(
         deleteS3LambdaDto,
       );
-      return await this.awsRepository.deleteS3Document(baseS3Object);
+      const result = await this.awsRepository.deleteS3Document(baseS3Object);
+      return result;
     } catch (error) {
       this.handleAwsBaseError(error);
     }
@@ -169,13 +170,22 @@ export class AwsService {
 
   private async createBaseS3ObjectFromDto(dto: IBaseS3LambdaDto) {
     const eTag = this.extractETagFromObject(dto);
-    const meta = await this.awsRepository.findS3DocumentByETag(eTag);
-    const url = this.createS3ObjectUrl(this.getBucketName(), meta.Key);
+    const meta = await this.s3
+      .headObject(
+        {
+          Bucket: this.getBucketName(),
+          Key: dto.Key,
+        },
+        this.handleAwsBaseError,
+      )
+      .promise();
+
+    const url = this.createEncodedS3ObjectUrl(this.getBucketName(), dto.Key);
 
     const result: BaseS3Object = {
       ETag: eTag,
       LastModified: meta.LastModified,
-      Key: meta.Key,
+      Key: dto.Key,
       Url: url,
     };
 
@@ -186,7 +196,7 @@ export class AwsService {
     const eTag = this.extractETagFromObject(s3Dto);
     const lastModified = this.extractLastModifiedFromS3Object(s3Dto);
     const objKey = this.extractObjectKeyFromS3Object(s3Dto);
-    const url = this.createS3ObjectUrl(this.getBucketName(), objKey);
+    const url = this.createEncodedS3ObjectUrl(this.getBucketName(), objKey);
 
     const s3Object: BaseS3Object = {
       ETag: eTag,
@@ -198,12 +208,14 @@ export class AwsService {
     return s3Object;
   }
 
-  private createS3ObjectUrl(
+  private createEncodedS3ObjectUrl(
     bucketName: S3.BucketName,
     objectKey: S3.ObjectKey,
   ) {
-    const objectUrl = `https://${bucketName}.s3.amazonaws.com/${objectKey}`;
-    return objectUrl;
+    const encodedObjectUrl = encodeURI(
+      `https://${bucketName}.s3.amazonaws.com/${objectKey}`,
+    );
+    return encodedObjectUrl;
   }
 
   private extractETagFromObject(obj: S3.Object): S3.ETag {
