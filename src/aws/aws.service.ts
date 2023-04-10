@@ -42,9 +42,11 @@ export class AwsService {
 
   public async deleteExistS3Document(deleteS3LambdaDto: DeleteS3LambdaDto) {
     try {
-      const key: S3.ObjectKey = this.refineS3ObjectKey(
-        this.extractObjectKeyFromS3Object(deleteS3LambdaDto),
-      );
+      const key: S3.ObjectKey =
+        this.extractObjectKeyFromS3Object(deleteS3LambdaDto);
+
+      console.log(key);
+
       const result = await this.awsRepository.deleteS3DocumentByKey(key);
       return result;
     } catch (error) {

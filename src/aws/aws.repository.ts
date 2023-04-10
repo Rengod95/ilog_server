@@ -19,13 +19,15 @@ export class AwsRepository implements MongoRepository {
   public async findS3DocumentByETag(
     eTag: S3.ETag,
   ): Promise<BaseS3ObjectDocument> {
-    const s3Document = await this.s3ObjectModel.findOne({ ETag: eTag }).exec();
+    const s3Document = this.s3ObjectModel.findOne({ ETag: eTag }).exec();
     return s3Document;
   }
 
   public async injectS3ObjectsToMongo(s3Objects: BaseS3Object[]) {
-    const s3Docs = s3Objects.map((s3Obj) => this.createS3Document(s3Obj));
-    const result = await this.s3ObjectModel.insertMany(s3Docs);
+    const s3Docs = await Promise.all(
+      s3Objects.map((s3Obj) => this.createS3Document(s3Obj)),
+    );
+    const result = this.s3ObjectModel.insertMany(s3Docs);
     return result;
   }
 
@@ -36,14 +38,12 @@ export class AwsRepository implements MongoRepository {
   }
 
   public async deleteS3DocumentByKey(key: S3.ObjectKey) {
-    const result = await this.s3ObjectModel
-      .findOneAndRemove({ Key: key })
-      .exec();
+    const result = this.s3ObjectModel.findOneAndRemove({ Key: key }).exec();
     return result;
   }
 
   public async replaceExistS3Document(replacement: BaseS3Object) {
-    const result = await this.s3ObjectModel
+    const result = this.s3ObjectModel
       .findOneAndReplace({ ETag: replacement.ETag }, replacement)
       .exec();
     return result;
