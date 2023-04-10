@@ -9,9 +9,5 @@ export class UpdateS3LambdaDto implements IBaseS3LambdaDto {
 
   @IsNotEmpty()
   @IsString()
-  LastModified: S3.LastModified;
-
-  @IsNotEmpty()
-  @IsString()
   ETag: S3.ETag;
 }

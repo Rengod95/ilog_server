@@ -13,21 +13,8 @@ export class AwsController {
    */
   @Post()
   async insertNewObject(@Body() createS3LambdaDto: CreateS3LambdaDto) {
+    console.log(createS3LambdaDto);
     const result = await this.awsService.insertNewS3Document(createS3LambdaDto);
-    return result;
-  }
-
-  /**
-   *
-   * @param modifyS3LambdaDto
-   * @returns
-   */
-  @Patch()
-  async updateExistObject(@Body() updateS3LambdaDto: UpdateS3LambdaDto) {
-    console.log(updateS3LambdaDto);
-    const result = await this.awsService.updateExistS3Document(
-      updateS3LambdaDto,
-    );
     return result;
   }
 
@@ -42,6 +29,6 @@ export class AwsController {
     const result = await this.awsService.deleteExistS3Document(
       deleteS3LambdaDto,
     );
-    return;
+    return result;
   }
 }

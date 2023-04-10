@@ -5,7 +5,10 @@ import { AwsRepository } from './aws.repository';
 import { BaseS3Object, IBaseS3Object } from './schema/s3-object.schema';
 import { UtilService } from 'src/shared/util.service';
 import { UpdateS3LambdaDto } from './dto/update-s3-document.dto';
-import { DeleteS3LambdaDto } from './dto/delete-s3-document.dto';
+import {
+  DeleteS3LambdaDto,
+  IBaseS3LambdaDto,
+} from './dto/delete-s3-document.dto';
 import { CreateS3LambdaDto } from './dto/create-s3-document.dto';
 
 @Injectable()
@@ -28,7 +31,9 @@ export class AwsService {
 
   public async updateExistS3Document(updateS3LambdaDto: UpdateS3LambdaDto) {
     try {
-      const baseS3Object = this.createBaseS3ObjectFromDto(updateS3LambdaDto);
+      const baseS3Object = await this.createBaseS3ObjectFromDto(
+        updateS3LambdaDto,
+      );
       return await this.awsRepository.replaceExistS3Document(baseS3Object);
     } catch (error) {
       this.handleAwsBaseError(error);
@@ -37,19 +42,40 @@ export class AwsService {
 
   public async deleteExistS3Document(deleteS3LambdaDto: DeleteS3LambdaDto) {
     try {
-      const baseS3Object = this.createBaseS3ObjectFromDto(deleteS3LambdaDto);
-
+      const baseS3Object = await this.createBaseS3ObjectFromDto(
+        deleteS3LambdaDto,
+      );
       return await this.awsRepository.deleteS3Document(baseS3Object);
     } catch (error) {
       this.handleAwsBaseError(error);
     }
   }
 
+  /**
+   * s3에 업로드 된 객체의 메타데이터를 mongo db에 저장합니다.
+   * 단 이미 존재하는 document는 update 로직을 실행합니다.
+   * @param createS3LambdaDto
+   * @param UpdateS3LambdaDto
+   * @param baseS3LambdaDto
+   *
+   */
   public async insertNewS3Document(createS3LambdaDto: CreateS3LambdaDto) {
     try {
-      const baseS3Object = this.createBaseS3ObjectFromDto(createS3LambdaDto);
+      const existObject = await this.isAlreadyExistOnMongo(
+        createS3LambdaDto.ETag,
+      );
+      const baseS3Object = await this.createBaseS3ObjectFromDto(
+        createS3LambdaDto,
+      );
 
-      return await this.awsRepository.injectSingleS3Object(baseS3Object);
+      if (existObject)
+        return await this.awsRepository.replaceExistS3Document(baseS3Object);
+
+      const result = await this.awsRepository.injectSingleS3Object(
+        baseS3Object,
+      );
+
+      return result;
     } catch (error) {
       this.handleAwsBaseError(error);
     }
@@ -83,8 +109,8 @@ export class AwsService {
       })
       .filter((obj) => !this.utilService.isEmpty(obj));
 
-    const baseS3Objects = filteredS3Objects.map((obj) =>
-      this.createBaseS3ObjectFromDto(obj),
+    const baseS3Objects = await Promise.all(
+      filteredS3Objects.map((obj) => this.createBaseS3ObjectFromDto(obj)),
     );
 
     const result = await this.awsRepository.injectS3ObjectsToMongo(
@@ -141,7 +167,22 @@ export class AwsService {
     return data;
   }
 
-  private createBaseS3ObjectFromDto(s3Dto: IBaseS3Object): BaseS3Object {
+  private async createBaseS3ObjectFromDto(dto: IBaseS3LambdaDto) {
+    const eTag = this.extractETagFromObject(dto);
+    const meta = await this.awsRepository.findS3DocumentByETag(eTag);
+    const url = this.createS3ObjectUrl(this.getBucketName(), meta.Key);
+
+    const result: BaseS3Object = {
+      ETag: eTag,
+      LastModified: meta.LastModified,
+      Key: meta.Key,
+      Url: url,
+    };
+
+    return result;
+  }
+
+  private createBaseS3ObjectFromS3Like(s3Dto: IBaseS3Object): BaseS3Object {
     const eTag = this.extractETagFromObject(s3Dto);
     const lastModified = this.extractLastModifiedFromS3Object(s3Dto);
     const objKey = this.extractObjectKeyFromS3Object(s3Dto);
