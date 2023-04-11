@@ -13,14 +13,6 @@ export class LogService {
     @Inject(LogRepository) private readonly logRepository: LogRepository,
   ) {}
 
-  // getAllLogs() {
-  //   return this.awsService.getAllObjectsByBucketName();
-  // }
-
-  createLogMeta(createLogMetaDto: CreateLogMetaDto) {
-    return this.logRepository.createLogMeta(createLogMetaDto);
-  }
-
   public async getLogList(getLogListDto: GetLogListDto) {
     const limit = this.extractLimitCount(getLogListDto);
     const skip = this.extractSkipCount(getLogListDto);

@@ -1,16 +1,10 @@
-import { CreateLogMetaDto } from './dto/create-log-meta.dto';
 import { GetLogListDto } from './dto/get-log-list.dto';
 import { LogService } from './log.service';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param } from '@nestjs/common';
 
 @Controller()
 export class LogController {
   constructor(private readonly logService: LogService) {}
-
-  @Post('/meta')
-  createNewLogMeta(@Body() createLogMetaDto: CreateLogMetaDto) {
-    return this.logService.createLogMeta(createLogMetaDto);
-  }
 
   @Get('/list')
   async getLogList(@Body() getLogListDto: GetLogListDto) {

@@ -7,9 +7,18 @@ import { LogController } from './log.controller';
 import { Log, LogSchema } from './log.schema';
 import { AwsService } from 'src/aws/aws.service';
 import { AwsRepository } from 'src/aws/aws.repository';
+import {
+  BaseS3Object,
+  BaseS3ObjectSchema,
+} from '../aws/schema/s3-object.schema';
 
 @Module({
-  imports: [MongooseModule.forFeature([{ name: Log.name, schema: LogSchema }])],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Log.name, schema: LogSchema },
+      { name: BaseS3Object.name, schema: BaseS3ObjectSchema },
+    ]),
+  ],
   providers: [LogService, LogRepository, AwsRepository],
   controllers: [LogController],
 })
