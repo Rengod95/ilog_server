@@ -4,6 +4,7 @@ import { LogRepository } from './log.repository';
 import { Inject, Injectable } from '@nestjs/common';
 import { AwsRepository } from 'src/aws/aws.repository';
 import { GetLogListDto } from './dto/get-log-list.dto';
+import { S3 } from 'aws-sdk';
 
 @Injectable()
 export class LogService {
@@ -28,6 +29,11 @@ export class LogService {
       skip,
       limit,
     );
+    return result;
+  }
+
+  public async getSingleLogDataByKey(key: S3.ObjectKey) {
+    const result = this.awsRepository.findS3DocumentByKey(key);
     return result;
   }
 
