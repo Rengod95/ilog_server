@@ -13,9 +13,9 @@ export class LogService {
     @Inject(LogRepository) private readonly logRepository: LogRepository,
   ) {}
 
-  public async getLogList(getLogListDto: GetLogListDto) {
-    const limit = this.extractLimitCount(getLogListDto);
-    const skip = this.extractSkipCount(getLogListDto);
+  public async getLogList(_skip: string, _limit: string) {
+    const limit = Number(_limit);
+    const skip = Number(_skip);
 
     const result = await this.awsRepository.getS3ObjectsWithPagination(
       skip,
@@ -25,7 +25,7 @@ export class LogService {
   }
 
   public async getSingleLogDataByKey(key: S3.ObjectKey) {
-    const result = this.awsRepository.findS3DocumentByKey(key);
+    const result = await this.awsRepository.findS3DocumentByKey(key);
     return result;
   }
 
