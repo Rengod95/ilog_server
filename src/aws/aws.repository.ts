@@ -23,6 +23,18 @@ export class AwsRepository implements MongoRepository {
     return s3Document;
   }
 
+  public async findS3DocumentByKey(
+    key: S3.ObjectKey,
+  ): Promise<BaseS3ObjectDocument> {
+    const result = await this.s3ObjectModel.findOne({ Key: key }).exec();
+    return result;
+  }
+
+  public async findS3DocumentById(id: any): Promise<BaseS3ObjectDocument> {
+    const result = await this.s3ObjectModel.findById(id).exec();
+    return result;
+  }
+
   public async injectS3ObjectsToMongo(s3Objects: BaseS3Object[]) {
     const s3Docs = await Promise.all(
       s3Objects.map((s3Obj) => this.createS3Document(s3Obj)),
@@ -47,6 +59,15 @@ export class AwsRepository implements MongoRepository {
       .findOneAndReplace({ ETag: replacement.ETag }, replacement)
       .exec();
     return result;
+  }
+
+  public async getS3ObjectsWithPagination(skip: number, limit: number) {
+    const documents = await this.s3ObjectModel
+      .find()
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    return documents;
   }
 
   private async createS3Document(
