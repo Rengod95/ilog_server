@@ -6,7 +6,7 @@ import { BaseResponseInterceptor } from './app.response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.enableCors();
   app.setGlobalPrefix('/api'); // Setting base path
   app.useGlobalPipes(new ValidationPipe()); // Initialize global validation
 
