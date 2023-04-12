@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Patch, Post } from '@nestjs/common';
 import { AwsService } from './aws.service';
 import { DeleteS3LambdaDto } from './dto/delete-s3-document.dto';
-import { UpdateS3LambdaDto } from './dto/update-s3-document.dto';
 import { CreateS3LambdaDto } from './dto/create-s3-document.dto';
+import { NormalizeKeyDtoPipe } from '../log/normalize-key.pipe';
 
 @Controller('/meta')
 export class AwsController {

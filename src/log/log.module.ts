@@ -11,6 +11,7 @@ import {
   BaseS3Object,
   BaseS3ObjectSchema,
 } from '../aws/schema/s3-object.schema';
+import { NormalizeKeyPipe } from './normalize-key.pipe';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import {
       { name: BaseS3Object.name, schema: BaseS3ObjectSchema },
     ]),
   ],
-  providers: [LogService, LogRepository, AwsRepository],
+  providers: [LogService, LogRepository, AwsRepository, NormalizeKeyPipe],
   controllers: [LogController],
 })
 export class LogModule {}

@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BaseS3Object, BaseS3ObjectSchema } from './schema/s3-object.schema';
 import { AwsRepository } from './aws.repository';
 import { UtilService } from 'src/shared/util.service';
+import { NormalizeKeyDtoPipe } from '../log/normalize-key.pipe';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { UtilService } from 'src/shared/util.service';
     ]),
   ],
   controllers: [AwsController],
-  providers: [AwsService, AwsRepository, UtilService],
+  providers: [AwsService, AwsRepository, UtilService, NormalizeKeyDtoPipe],
 })
 export class AwsModule {}

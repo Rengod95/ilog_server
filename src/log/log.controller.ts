@@ -1,4 +1,3 @@
-import { GetLogListDto } from './dto/get-log-list.dto';
 import { LogService } from './log.service';
 import { Body, Controller, Get, Param, Query } from '@nestjs/common';
 
@@ -12,9 +11,9 @@ export class LogController {
     return result;
   }
 
-  @Get('/:key')
-  async getLogData(@Param('key') key: string) {
-    const result = await this.logService.getSingleLogDataByKey(key);
+  @Get('/:etag')
+  async getLogData(@Param('etag') etag: string) {
+    const result = await this.logService.getSingleLogDataByETag(etag);
     return result;
   }
 }

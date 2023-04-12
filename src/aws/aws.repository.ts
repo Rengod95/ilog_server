@@ -27,6 +27,7 @@ export class AwsRepository implements MongoRepository {
     key: S3.ObjectKey,
   ): Promise<BaseS3ObjectDocument> {
     const result = await this.s3ObjectModel.findOne({ Key: key }).exec();
+    console.log(result);
     return result;
   }
 

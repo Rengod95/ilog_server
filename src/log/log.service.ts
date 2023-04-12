@@ -25,8 +25,13 @@ export class LogService {
   }
 
   public async getSingleLogDataByKey(key: S3.ObjectKey) {
+    console.log(key);
     const result = await this.awsRepository.findS3DocumentByKey(key);
     return result;
+  }
+
+  public async getSingleLogDataByETag(eTag: S3.ETag) {
+    return await this.awsRepository.findS3DocumentByETag(eTag);
   }
 
   private extractSkipCount(dto: GetLogListDto): number {
